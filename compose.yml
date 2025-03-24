@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3.9-management-alpine
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitmq-logs:/var/log/rabbitmq
+
+  publisher:
+    build: .
+    depends_on:
+      - rabbitmq
+    command: python publisher.py
+    volumes:
+      - ./input.txt:/app/input.txt
+      - publisher-logs:/app/logs
+
+  consumer1:
+    build: .
+    depends_on:
+      - rabbitmq
+    command: python consumer.py
+    volumes:
+      - consumer1-logs:/app/logs
+
+  consumer2:
+    build: .
+    depends_on:
+      - rabbitmq
+    command: python consumer.py
+    volumes:
+      - consumer2-logs:/app/logs
+
+volumes:
+  rabbitmq-data:
+  rabbitmq-logs:
+  publisher-logs:
+  consumer1-logs:
+  consumer2-logs:
